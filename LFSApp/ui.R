@@ -1,8 +1,3 @@
-library(DT)
-library(shiny)
-library(dplyr)
-library(rCharts, lib.loc = 'H:/R/win-library/3.3')
-
 # Use a fluid Bootstrap layout
 fluidPage(    
   

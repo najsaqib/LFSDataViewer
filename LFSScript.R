@@ -6,6 +6,8 @@ library(zoo) #to deal with dates that only have year and month, with no days
 library(shiny)
 library(DT)
 library(car)
+library(rmarkdown)
+library(rCharts)
 
 
 MonthlyLFSx <- mergeCANSIM(c(2820087,2820089)) #downloading and merging these two LFS-related tables from CANSIM

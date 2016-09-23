@@ -1,9 +1,3 @@
-library(shiny)
-library(dplyr)
-library(rmarkdown)
-library(DT) # using the more advanced Datatable package
-library(rCharts, lib.loc = 'H:/R/win-library/3.3') # using this package as opposed to ggplot2 for interactive viz.
-
 function(input, output) {
   
   output$LFSTable <- DT::renderDataTable(MonthlyLFSx1 %>% 

@@ -12,8 +12,12 @@ library(rCharts)
 
 MonthlyLFSx <- mergeCANSIM(c(2820087,2820089)) #downloading and merging these two LFS-related tables from CANSIM
 metadataMonthlyx <- data.frame(colnames(MonthlyLFSx),label(MonthlyLFSx)) # create metadata data.frame to view all labels
-MonthlyLFSx$Date <- as.yearmon(MonthlyLFSx$t,format="%Y/%m") # turning the time variable into an explicit date variable
+MonthlyLFSx$Date <- as.Date(as.yearmon(MonthlyLFSx$t,format="%Y/%m")) # turning the time variable into an explicit date variable
 MonthlyLFSx1 <- MonthlyLFSx %>% select(t,Date,i,V16,V922,V463,V148,V236,V138,V154,V164,V1057,V1072,V1087)
+
+
+# MonthlyLFSx1$Var2 <- as.double(as.POSIXct(as.Date(MonthlyLFSx1$Date,"%Y-%m-%d")),origin="1976-01-01")
+
 
 # Generate functions to calculate growths and attaching lagged values of certain variables
 
@@ -54,9 +58,18 @@ MonthlyLFSx1 <- MonthlyLFSx1 %>% group_by(i) %>% mutate(URLastYear = LastYearUR(
 MonthlyLFSx1 <- rename(MonthlyLFSx1,Employment=V16)
 MonthlyLFSx1 <- rename(MonthlyLFSx1,UnRate=V922)
 
+# Create new table for the line graph, which retains a working date format
+
+MonthlyLFSx2 <- MonthlyLFSx1
+MonthlyLFSx2$Date2 <- as.Date(as.yearmon(MonthlyLFSx2$t, format = "%Y/%m"))
+
 # Rounding figures and suppressing scientific notation
 
 MonthlyLFSx1 <- format(MonthlyLFSx1, big.mark=",", scientific=FALSE, TRIM=TRUE)
+
+# MonthlyLFSx1$Var2 <- as.double(as.POSIXct(as.Date(MonthlyLFSx$Date,"%Y-%m-%d")),origin="1976-01-01")
+
+
 
 # Run the Shiny app
 

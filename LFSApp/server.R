@@ -326,4 +326,22 @@ function(input, output) {
    
   })
   
+  output$TimeSeries <- renderChart({
+    
+    # Render a discrete bar graph using rChart and the java script package nvd3
+    
+    # r1 <- Rickshaw$new()
+    # r1$layer(V922 ~ Var2, data = MonthlyLFSx2, group = "i", type="line")
+    # r1$set(slider = TRUE, dom="TimeSeries")
+    # return(r1)
+   
+    
+    n2 <- nPlot(UnRate ~ Date, 
+                data = MonthlyLFSx2 %>% filter(i=="British Columbia" | i=="Canada"), group = "i", 
+                type = 'lineWithFocusChart', dom = "TimeSeries")
+    n2$xAxis(tickFormat="#!function(d) {return d3.time.format.utc('%Y-%m-%d')(new Date(d * 24 * 60 * 60 * 1000));}!#" )
+    n2
+    
+  })
+  
 }

@@ -52,6 +52,13 @@ fluidPage(
      
         # Second tab
         
+        tabPanel("Line Graph",
+                 h3("Unemployment Rate",align="center"),
+                 showOutput("TimeSeries", lib="nvd3") # The line graph for BC and Canada
+        ),
+        
+        # Third tab
+        
         tabPanel("Data Table", DT::dataTableOutput("LFSTable"))  # The main datatable
     
      

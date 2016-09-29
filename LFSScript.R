@@ -8,7 +8,8 @@ library(DT)
 library(car)
 library(rmarkdown)
 library(rCharts)
-
+library(tidyr)
+library(xts)
 
 MonthlyLFSx <- mergeCANSIM(c(2820087,2820089)) #downloading and merging these two LFS-related tables from CANSIM
 metadataMonthlyx <- data.frame(colnames(MonthlyLFSx),label(MonthlyLFSx)) # create metadata data.frame to view all labels
@@ -70,13 +71,24 @@ MonthlyLFSx1 <- format(MonthlyLFSx1, big.mark=",", scientific=FALSE, TRIM=TRUE)
 # MonthlyLFSx1$Var2 <- as.double(as.POSIXct(as.Date(MonthlyLFSx$Date,"%Y-%m-%d")),origin="1976-01-01")
 
 
+# Seperate into more columns, for the time series graph
+
+wide_UnRate <- MonthlyLFSx2 %>% select(Date,i,UnRate) %>% spread(i,UnRate)
+
+# Save relevant data frames as RDS files
+
+saveRDS(wide_UnRate, "C:/RProjects/LFS/LFSApp/Data/wideUnRate.rds")
+saveRDS(MonthlyLFSx1, "C:/RProjects/LFS/LFSApp/Data/MonthlyLFSx1.rds")
+saveRDS(MonthlyLFSx2, "C:/RProjects/LFS/LFSApp/Data/MonthlyLFSx2.rds")
+
 
 # Run the Shiny app
 
-runApp('LFSApp')
+# runApp('LFSApp')
 
+# Deploy the app on Shiny IO
 
-
-
-
-
+library(shiny)
+#setwd("C:/Users/Najmus/Documents/R/LFSDataViewer")
+setwd("C:/RProjects/LFS")
+rsconnect::deployApp('LFSApp')

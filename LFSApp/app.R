@@ -1,22 +1,25 @@
-MonthlyLFSx1 <- readRDS("Data/data1.rds")
-MonthlyLFSx2 <- readRDS("Data/data2.rds")
+MonthlyLFSx1 <- readRDS("Data/MonthlyLFSx1.rds")
+MonthlyLFSx2 <- readRDS("Data/MonthlyLFSx2.rds")
+wide_UnRate <- readRDS("Data/wideUnRate.rds")
 
 library(dplyr)
-library(ggplot2)
+#library(ggplot2)
 library(CANSIM2R) # this package downloads CANSIM tables
-library(Hmisc) # need this package to read labels
+#library(Hmisc) # need this package to read labels
 library(zoo) #to deal with dates that only have year and month, with no days
 library(shiny)
 library(DT)
-library(car)
+#library(car)
 library(rmarkdown)
 library(rCharts)
-library(rsconnect)
+#library(rsconnect)
+library(dygraphs)
+library(xts)
 
 server <- function(input, output) {
   
   output$LFSTable <- DT::renderDataTable(MonthlyLFSx1 %>% 
-                                           filter(t==input$RefMonth),
+                                           filter(Date==input$RefMonth),
                                          # colnames = c('Organization ID','Engagement',
                                          #              'Count 2013','Count 2015',
                                          #              'Net Gain/Loss','% Change',
@@ -47,12 +50,20 @@ server <- function(input, output) {
     }
   )
   
+  output$ReferenceProvince <- renderText( 
+    {
+      
+      paste("The reference province is:", input$Province)
+      
+    }
+  )
+  
   output$UR <- renderText( 
     {
       
       paste("The current unemployment rate is: ", MonthlyLFSx1 %>% 
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(UnRate),
             "%",sep="")
       
@@ -64,8 +75,8 @@ server <- function(input, output) {
     {
       
       paste("The unemployment rate last month was: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(URLast),
             "%",sep="")
       
@@ -77,8 +88,8 @@ server <- function(input, output) {
     {
       
       paste("The unemployment rate last year was: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(URLastYear),
             "%",sep="")
       
@@ -90,8 +101,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, employment changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmp15Over),
             sep="")
       
@@ -103,8 +114,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, labour force changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMLF15Over),
             sep="")
       
@@ -116,8 +127,8 @@ server <- function(input, output) {
     {
       
       paste("since last year, employment changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(YoYEmp15Over),
             sep="")
       
@@ -129,8 +140,8 @@ server <- function(input, output) {
     {
       
       paste("since last year, labour force changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(YoYLF15Over),
             sep="")
       
@@ -142,8 +153,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, full-time jobs changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpFT15Over),
             sep="")
       
@@ -155,8 +166,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, part-time jobs changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpPT15Over),
             sep="")
       
@@ -168,8 +179,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, full-time jobs for 15-24 changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpFT1524),
             sep="")
       
@@ -181,8 +192,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, full-time jobs for 25-54 changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpFT2554),
             sep="")
       
@@ -194,8 +205,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, full-time jobs for 55 & over changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpFT54Over),
             sep="")
       
@@ -207,8 +218,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, public sector jobs changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpPublic),
             sep="")
       
@@ -220,8 +231,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, private sector jobs changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpPrivate),
             sep="")
       
@@ -233,8 +244,8 @@ server <- function(input, output) {
     {
       
       paste("since last month, self employment changed by : ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
-              filter(i=="British Columbia") %>%
+              filter(Date==input$RefMonth) %>%
+              filter(i==input$Province) %>%
               select(MoMEmpSelf),
             sep="")
       
@@ -246,7 +257,7 @@ server <- function(input, output) {
     {
       
       paste("In Canada, the current unemployment rate is: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
+              filter(Date==input$RefMonth) %>%
               filter(i=="Canada") %>%
               select(UnRate), "%",
             sep="")
@@ -259,7 +270,7 @@ server <- function(input, output) {
     {
       
       paste("In Canada, the unemployment rate last month was: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
+              filter(Date==input$RefMonth) %>%
               filter(i=="Canada") %>%
               select(URLast), "%",
             sep="")
@@ -272,7 +283,7 @@ server <- function(input, output) {
     {
       
       paste("In Canada, since last month, employment changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
+              filter(Date==input$RefMonth) %>%
               filter(i=="Canada") %>%
               select(MoMEmp15Over),
             sep="")
@@ -285,7 +296,7 @@ server <- function(input, output) {
     {
       
       paste("In Canada, full-time jobs changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
+              filter(Date==input$RefMonth) %>%
               filter(i=="Canada") %>%
               select(MoMEmpFT15Over),
             sep="")
@@ -298,7 +309,7 @@ server <- function(input, output) {
     {
       
       paste("In Canada, part-time jobs changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
+              filter(Date==input$RefMonth) %>%
               filter(i=="Canada") %>%
               select(MoMEmpPT15Over),
             sep="")
@@ -311,7 +322,7 @@ server <- function(input, output) {
     {
       
       paste("In Canada, labour force changed by: ", MonthlyLFSx1 %>%
-              filter(t==input$RefMonth) %>%
+              filter(Date==input$RefMonth) %>%
               filter(i=="Canada") %>%
               select(MoMLF15Over),
             sep="")
@@ -325,11 +336,11 @@ server <- function(input, output) {
     
     # Render a discrete bar graph using rChart and the java script package nvd3
     
-    n1 <- nPlot(x= 'i', y = 'UnRate', data = MonthlyLFSx1 %>% filter(t==input$RefMonth), 
+    n1 <- nPlot(x= 'i', y = 'UnRate', data = MonthlyLFSx1 %>% filter(Date==input$RefMonth), 
                 type = 'discreteBarChart', dom = 'URPlot')
     n1$yAxis(axisLabel = "%", width=40) # width can't exceed 64; won't show otherwise
-    n1$chart(color = c('#263359', '#335926', '#592633', '#263359', '#263359', '#263359', '#263359', '#263359', 
-                       '#263359', '#263359', '#263359'))
+    n1$chart(color = c('#263359', '#263359', '#592633', '#263359', '#263359', '#263359', '#263359', '#263359', 
+                      '#263359', '#263359', '#263359'))
     
     # Commented code below is handy for multile bar chart type as opposed to discrete
     #n1$chart(color = "#! function(d){ return 'blue'} !#")
@@ -341,22 +352,43 @@ server <- function(input, output) {
     
   })
   
-  output$TimeSeries <- renderChart({
+  # output$TimeSeries <- renderChart({
+  #   
+  #   # Render a discrete bar graph using rChart and the java script package Rickshaw or nvd2
+  #   
+  #   # r1 <- Rickshaw$new()
+  #   # r1$layer(V922 ~ Var2, data = MonthlyLFSx2, group = "i", type="line")
+  #   # r1$set(slider = TRUE, dom="TimeSeries")
+  #   # return(r1)
+  #   
+  #   
+  #   n2 <- nPlot(UnRate ~ Date, 
+  #               data = MonthlyLFSx2 %>% filter(i=="British Columbia" | i=="Canada"), group = "i", 
+  #               type = 'lineWithFocusChart', dom = "TimeSeries")
+  #   n2$xAxis(tickFormat="#!function(d) {return d3.time.format.utc('%Y-%m-%d')(new Date(d * 24 * 60 * 60 * 1000));}!#" )
+  #   n2
+  #   
+  #   
+  #   
+  # })
+  
+  output$dygraph <- renderDygraph({
     
-    # Render a discrete bar graph using rChart and the java script package nvd3
+    wide_UnRate2 <- wide_UnRate %>% select(get(input$Province)) #kinda crappy way to select by input which provice to chart
+    wide_UnRate3 <- xts(wide_UnRate2, as.Date(wide_UnRate$Date, format='%y-%m-%d')) # convert the above table to time series
     
-    # r1 <- Rickshaw$new()
-    # r1$layer(V922 ~ Var2, data = MonthlyLFSx2, group = "i", type="line")
-    # r1$set(slider = TRUE, dom="TimeSeries")
-    # return(r1)
-    
-    
-    n2 <- nPlot(UnRate ~ Date, 
-                data = MonthlyLFSx2 %>% filter(i=="British Columbia" | i=="Canada"), group = "i", 
-                type = 'lineWithFocusChart', dom = "TimeSeries")
-    n2$xAxis(tickFormat="#!function(d) {return d3.time.format.utc('%Y-%m-%d')(new Date(d * 24 * 60 * 60 * 1000));}!#" )
-    n2
-    
+    dygraph(wide_UnRate3, main = "Unemployment Rate by Province") %>%
+      dyRangeSelector() %>%
+      dyShading(from = "1990-1-1", to = "1991-1-1") %>%
+      dyShading(from = "2009-1-1", to = "2011-1-1") %>%
+      dyAxis("y", label = "Unemp. Rate (%)") %>%
+      dyEvent(input$RefMonth, "Reference Month", labelLoc = "bottom") %>%
+      #dyLegend(show = "follow") %>%
+      dyOptions(colors = RColorBrewer::brewer.pal(8, "Set2"), drawGrid = FALSE) 
+    # %>%
+      # dyHighlight(highlightCircleSize = 5,
+      #             highlightSeriesBackgroundAlpha = 0.2,
+      #             hideOnMouseOut = FALSE)
   })
   
 }
@@ -365,7 +397,7 @@ server <- function(input, output) {
 ui <- fluidPage(    
   
   # Give the page a title
-  titlePanel("LFS Highlights Helper"),
+  titlePanel("Labour Force Survey Highlights"),
   
   # Generate a row with a sidebar
   sidebarLayout(      
@@ -373,9 +405,12 @@ ui <- fluidPage(
     # Define the sidebar with one input
     sidebarPanel(
       selectInput("RefMonth", "Reference Month", 
-                  unique(as.character(MonthlyLFSx1$t)),selected = "2016/01"),
+                  unique(as.character(MonthlyLFSx1$Date)),selected = "2016-01-01"),
+      selectInput("Province", "Province",
+                  unique(as.character(MonthlyLFSx2$i)),selected = "Alberta"),
       hr(),
       textOutput("ReferenceMonth"), 
+      textOutput("ReferenceProvince"),
       textOutput("UR"),
       textOutput("URLast"),
       textOutput("EmpChangeMonth"),
@@ -411,13 +446,15 @@ ui <- fluidPage(
         tabPanel("Bar Graph",
                  h3("Unemployment Rate",align="center"),
                  showOutput("URPlot", lib="nvd3") # The bar graph for all provinces
+                 
         ), 
         
         # Second tab
         
         tabPanel("Line Graph",
-                 h3("Unemployment Rate",align="center"),
-                 showOutput("TimeSeries", lib="nvd3") # The line graph for BC and Canada
+                 #h3("UR",align="center"),
+                 #showOutput("TimeSeries", lib="nvd3") # The line graph for BC and Canada
+                 dygraphOutput("dygraph")
         ),
         
         # Third tab

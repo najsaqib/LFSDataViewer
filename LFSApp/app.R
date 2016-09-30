@@ -374,7 +374,7 @@ server <- function(input, output) {
   
   output$dygraph <- renderDygraph({
     
-    wide_UnRate2 <- wide_UnRate %>% select(get(input$Province)) #kinda crappy way to select by input which provice to chart
+    wide_UnRate2 <- wide_UnRate %>% select(get(input$Province)) #kinda crappy way to select by input which province to chart
     wide_UnRate3 <- xts(wide_UnRate2, as.Date(wide_UnRate$Date, format='%y-%m-%d')) # convert the above table to time series
     
     dygraph(wide_UnRate3, main = "Unemployment Rate by Province") %>%
@@ -397,7 +397,7 @@ server <- function(input, output) {
 ui <- fluidPage(    
   
   # Give the page a title
-  titlePanel("Labour Force Survey Highlights"),
+  titlePanel("Labour Force Survey Highlights TS1"),
   
   # Generate a row with a sidebar
   sidebarLayout(      
@@ -405,9 +405,9 @@ ui <- fluidPage(
     # Define the sidebar with one input
     sidebarPanel(
       selectInput("RefMonth", "Reference Month", 
-                  unique(as.character(MonthlyLFSx1$Date)),selected = "2016-01-01"),
+                  unique(as.character(MonthlyLFSx1$Date)),selected = max(MonthlyLFSx1$Date)),
       selectInput("Province", "Province",
-                  unique(as.character(MonthlyLFSx2$i)),selected = "Alberta"),
+                  unique(as.character(MonthlyLFSx2$i)),selected = "British Columbia"),
       hr(),
       textOutput("ReferenceMonth"), 
       textOutput("ReferenceProvince"),

@@ -11,6 +11,8 @@ library(rCharts)
 library(tidyr)
 library(xts)
 
+# Altered Rprofile.site file to work with Rscript.ext (which is used for Task scheduler)
+
 MonthlyLFSx <- mergeCANSIM(c(2820087,2820089)) #downloading and merging these two LFS-related tables from CANSIM
 metadataMonthlyx <- data.frame(colnames(MonthlyLFSx),label(MonthlyLFSx)) # create metadata data.frame to view all labels
 MonthlyLFSx$Date <- as.Date(as.yearmon(MonthlyLFSx$t,format="%Y/%m")) # turning the time variable into an explicit date variable

@@ -374,7 +374,7 @@ server <- function(input, output) {
   
   output$dygraph <- renderDygraph({
     
-    wide_UnRate2 <- wide_UnRate %>% select(get(input$Province)) #kinda crappy way to select by input which province to chart
+    wide_UnRate2 <- wide_UnRate[,input$Province2] # using base syntax to allow for multiple inputs
     wide_UnRate3 <- xts(wide_UnRate2, as.Date(wide_UnRate$Date, format='%y-%m-%d')) # convert the above table to time series
     
     dygraph(wide_UnRate3, main = "Unemployment Rate by Province") %>%
@@ -407,7 +407,10 @@ ui <- fluidPage(
       selectInput("RefMonth", "Reference Month", 
                   unique(as.character(MonthlyLFSx1$Date)),selected = max(MonthlyLFSx1$Date)),
       selectInput("Province", "Province",
-                  unique(as.character(MonthlyLFSx2$i)),selected = "British Columbia"),
+                  unique(as.character(MonthlyLFSx1$i)),selected = "British Columbia"),
+      selectInput("Province2", "Province2",
+                  unique(as.character(MonthlyLFSx1$i)),selected = "British Columbia",multiple = TRUE),
+      helpText("For line graph tab: can select multiple regions"),
       hr(),
       textOutput("ReferenceMonth"), 
       textOutput("ReferenceProvince"),

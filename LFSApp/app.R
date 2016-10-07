@@ -1,3 +1,5 @@
+# setwd("C:/RProjects/LFS/LFSApp")
+
 MonthlyLFSx1 <- readRDS("Data/MonthlyLFSx1.rds")
 MonthlyLFSx2 <- readRDS("Data/MonthlyLFSx2.rds")
 wide_UnRate <- readRDS("Data/wideUnRate.rds")
@@ -19,16 +21,16 @@ library(xts)
 server <- function(input, output) {
   
   output$LFSTable <- DT::renderDataTable(MonthlyLFSx1 %>% 
-                                           filter(Date==input$RefMonth),
-                                         # colnames = c('Organization ID','Engagement',
-                                         #              'Count 2013','Count 2015',
-                                         #              'Net Gain/Loss','% Change',
-                                         #              'Organization'), # headers
+                                           filter(Date==input$RefMonth2),
+                                        colnames = c('Region' = 'i',
+                                                     'Unemployment Rate' = 'UnRate'
+                                                     ), # headers
                                          rownames = FALSE,
                                          extensions = 'Buttons',
                                          class = 'cell-border stripe hover', #styling opts.
                                          options=list(
                                            dom='Bt ', # only show buttons and table, hence Bt
+                                           pageLength = 11, # the maximum number of elements to show; default = 10
                                            buttons = 
                                              list('copy', 'print', list(
                                                extend = 'collection',
@@ -36,8 +38,8 @@ server <- function(input, output) {
                                                text = 'Download Data'
                                              )),
                                            columnDefs = list(
-                                             list(targets={{1}},visible = FALSE)
-                                           ) # hide second column
+                                             list(targets={{0}},visible = FALSE)
+                                             ) # hide second column
                                          ) 
   ) 
   
@@ -50,10 +52,10 @@ server <- function(input, output) {
     }
   )
   
-  output$ReferenceProvince <- renderText( 
+  output$ReferenceRegion <- renderText( 
     {
       
-      paste("The reference province is:", input$Province)
+      paste("The reference region is:", input$Region)
       
     }
   )
@@ -63,7 +65,7 @@ server <- function(input, output) {
       
       paste("The current unemployment rate is: ", MonthlyLFSx1 %>% 
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(UnRate),
             "%",sep="")
       
@@ -76,7 +78,7 @@ server <- function(input, output) {
       
       paste("The unemployment rate last month was: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(URLast),
             "%",sep="")
       
@@ -89,7 +91,7 @@ server <- function(input, output) {
       
       paste("The unemployment rate last year was: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(URLastYear),
             "%",sep="")
       
@@ -102,7 +104,7 @@ server <- function(input, output) {
       
       paste("since last month, employment changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmp15Over),
             sep="")
       
@@ -115,7 +117,7 @@ server <- function(input, output) {
       
       paste("since last month, labour force changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMLF15Over),
             sep="")
       
@@ -128,7 +130,7 @@ server <- function(input, output) {
       
       paste("since last year, employment changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(YoYEmp15Over),
             sep="")
       
@@ -141,7 +143,7 @@ server <- function(input, output) {
       
       paste("since last year, labour force changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(YoYLF15Over),
             sep="")
       
@@ -154,7 +156,7 @@ server <- function(input, output) {
       
       paste("since last month, full-time jobs changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpFT15Over),
             sep="")
       
@@ -167,7 +169,7 @@ server <- function(input, output) {
       
       paste("since last month, part-time jobs changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpPT15Over),
             sep="")
       
@@ -180,7 +182,7 @@ server <- function(input, output) {
       
       paste("since last month, full-time jobs for 15-24 changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpFT1524),
             sep="")
       
@@ -193,7 +195,7 @@ server <- function(input, output) {
       
       paste("since last month, full-time jobs for 25-54 changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpFT2554),
             sep="")
       
@@ -206,7 +208,7 @@ server <- function(input, output) {
       
       paste("since last month, full-time jobs for 55 & over changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpFT54Over),
             sep="")
       
@@ -219,7 +221,7 @@ server <- function(input, output) {
       
       paste("since last month, public sector jobs changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpPublic),
             sep="")
       
@@ -232,7 +234,7 @@ server <- function(input, output) {
       
       paste("since last month, private sector jobs changed by: ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpPrivate),
             sep="")
       
@@ -245,7 +247,7 @@ server <- function(input, output) {
       
       paste("since last month, self employment changed by : ", MonthlyLFSx1 %>%
               filter(Date==input$RefMonth) %>%
-              filter(i==input$Province) %>%
+              filter(i==input$Region) %>%
               select(MoMEmpSelf),
             sep="")
       
@@ -374,103 +376,135 @@ server <- function(input, output) {
   
   output$dygraph <- renderDygraph({
     
-    wide_UnRate2 <- wide_UnRate[,input$Province2] # using base syntax to allow for multiple inputs
+    wide_UnRate2 <- wide_UnRate[,input$Region2] # using base syntax to allow for multiple inputs
     wide_UnRate3 <- xts(wide_UnRate2, as.Date(wide_UnRate$Date, format='%y-%m-%d')) # convert the above table to time series
     
-    dygraph(wide_UnRate3, main = "Unemployment Rate by Province") %>%
+    dygraph(wide_UnRate3, main = "Unemployment Rate by Region") %>%
       dyRangeSelector() %>%
       dyShading(from = "1990-1-1", to = "1991-1-1") %>%
       dyShading(from = "2009-1-1", to = "2011-1-1") %>%
       dyAxis("y", label = "Unemp. Rate (%)") %>%
       dyEvent(input$RefMonth, "Reference Month", labelLoc = "bottom") %>%
       #dyLegend(show = "follow") %>%
-      dyOptions(colors = RColorBrewer::brewer.pal(8, "Set2"), drawGrid = FALSE) 
-    # %>%
-      # dyHighlight(highlightCircleSize = 5,
-      #             highlightSeriesBackgroundAlpha = 0.2,
-      #             hideOnMouseOut = FALSE)
+      dyOptions(colors = RColorBrewer::brewer.pal(8, "Set2"), drawGrid = FALSE) %>%
+      dyHighlight(highlightCircleSize = 5,
+                highlightSeriesBackgroundAlpha = 0.2,
+                hideOnMouseOut = TRUE)
   })
   
 }
+
+  ################# UI section starts below #################
 
 # Use a fluid Bootstrap layout
 ui <- fluidPage(    
   
   # Give the page a title
-  titlePanel("Labour Force Survey Highlights TS1"),
+  titlePanel("Labour Force Survey Highlights"),
   
-  # Generate a row with a sidebar
-  sidebarLayout(      
+  tabsetPanel(
     
-    # Define the sidebar with one input
-    sidebarPanel(
-      selectInput("RefMonth", "Reference Month", 
-                  unique(as.character(MonthlyLFSx1$Date)),selected = max(MonthlyLFSx1$Date)),
-      selectInput("Province", "Province",
-                  unique(as.character(MonthlyLFSx1$i)),selected = "British Columbia"),
-      selectInput("Province2", "Province2",
-                  unique(as.character(MonthlyLFSx1$i)),selected = "British Columbia",multiple = TRUE),
-      helpText("For line graph tab: can select multiple regions"),
-      hr(),
-      textOutput("ReferenceMonth"), 
-      textOutput("ReferenceProvince"),
-      textOutput("UR"),
-      textOutput("URLast"),
-      textOutput("EmpChangeMonth"),
-      textOutput("LFChangeMonth"),
-      textOutput("EmpChangeYear"),
-      textOutput("LFChangeYear"),
-      textOutput("URLastYear"),
-      hr(),
-      textOutput("FTMonth"),
-      textOutput("PTMonth"),
-      textOutput("FTMonth1524"),
-      textOutput("FTMonth2554"),
-      textOutput("FTMonth55Over"),
-      hr(),
-      textOutput("Public"),
-      textOutput("Private"),
-      textOutput("Self"),
-      hr(),
-      textOutput("CanUR"),
-      textOutput("CanURLast"),
-      textOutput("CanMoMEmp"),
-      textOutput("CanFT"),
-      textOutput("CanPT"),
-      textOutput("CanLF")
-    ),
+          # First tab
+        tabPanel("Bar Graph", 
+          
+          sidebarLayout(      
     
-    # The main panel
-    mainPanel(
-      tabsetPanel( # Inserting tabs
-        
-        # First tab
-        
-        tabPanel("Bar Graph",
+              
+              sidebarPanel(
+                  selectInput("RefMonth", "Reference Month", 
+                    unique(as.character(MonthlyLFSx1$Date)),selected = max(MonthlyLFSx1$Date)),
+                  selectInput("Region", "Region",
+                    unique(as.character(MonthlyLFSx1$i)),selected = "British Columbia"),
+                  hr(),
+                  textOutput("ReferenceMonth"), 
+                  textOutput("ReferenceRegion"),
+                  textOutput("UR"),
+                  textOutput("URLast"),
+                  textOutput("EmpChangeMonth"),
+                  textOutput("LFChangeMonth"),
+                  textOutput("EmpChangeYear"),
+                  textOutput("LFChangeYear"),
+                  textOutput("URLastYear"),
+                  hr(),
+                  textOutput("FTMonth"),
+                  textOutput("PTMonth"),
+                  textOutput("FTMonth1524"),
+                  textOutput("FTMonth2554"),
+                  textOutput("FTMonth55Over"),
+                  hr(),
+                  textOutput("Public"),
+                  textOutput("Private"),
+                  textOutput("Self"),
+                  hr(),
+                  textOutput("CanUR"),
+                  textOutput("CanURLast"),
+                  textOutput("CanMoMEmp"),
+                  textOutput("CanFT"),
+                  textOutput("CanPT"),
+                  textOutput("CanLF")
+                          ),
+                     
+            # The main panel
+              mainPanel(
                  h3("Unemployment Rate",align="center"),
-                 showOutput("URPlot", lib="nvd3") # The bar graph for all provinces
-                 
-        ), 
+                 showOutput("URPlot", lib="nvd3") # The bar graph for all Regions
+                        )         
+                    )
+              ), 
         
         # Second tab
         
         tabPanel("Line Graph",
-                 #h3("UR",align="center"),
-                 #showOutput("TimeSeries", lib="nvd3") # The line graph for BC and Canada
-                 dygraphOutput("dygraph")
-        ),
+                 
+                 sidebarLayout(      
+                   
+                   # Define the sidebar with one input
+                    sidebarPanel(
+                        selectInput("Region2", "Region(s)",
+                                 unique(as.character(MonthlyLFSx1$i)),selected = "British Columbia",multiple = TRUE),
+                        helpText("Can select multiple regions")
+                    
+                   ),
+                 
+                 mainPanel(
+                   
+                   dygraphOutput("dygraph")
+                   
+                   
+                 
+                   )         
+                 )
+              ), 
+        
         
         # Third tab
         
-        tabPanel("Data Table", DT::dataTableOutput("LFSTable"))  # The main datatable
-        
-        
+          tabPanel("Data Table",
+           
+                 sidebarLayout(      
+             
+             # Define the sidebar 
+                  sidebarPanel(
+                      selectInput("RefMonth2", "Reference Month", 
+                           unique(as.character(MonthlyLFSx1$Date)),selected = max(MonthlyLFSx1$Date))
+               
+             ),
+           
+           mainPanel(
+                     DT::dataTableOutput("LFSTable"))  # The main datatable
+             
+             
+             
+             
+             
+           )
+        )
       )
-      
+        
+        
+        
     )
-    
-  )
-)
+      
 
 
 shinyApp(ui = ui, server = server)

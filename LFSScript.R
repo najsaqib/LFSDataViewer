@@ -18,6 +18,9 @@ metadataMonthlyx <- data.frame(colnames(MonthlyLFSx),label(MonthlyLFSx)) # creat
 MonthlyLFSx$Date <- as.Date(as.yearmon(MonthlyLFSx$t,format="%Y/%m")) # turning the time variable into an explicit date variable
 MonthlyLFSx1 <- MonthlyLFSx %>% select(t,Date,i,V16,V922,V463,V148,V236,V138,V154,V164,V1057,V1072,V1087)
 
+IndustryLFSx <- getCANSIM(2820088) # download the data for industries, without merging it onto existing tables; faster
+metadataIndustryx <- data.frame(colnames(IndustryLFSx),label(IndustryLFSx)) # create metadata data.frame to view all labels
+IndustryLFSx$Date <- as.Date(as.yearmon(IndustryLFSx$t,format="%Y/%m"))
 
 # MonthlyLFSx1$Var2 <- as.double(as.POSIXct(as.Date(MonthlyLFSx1$Date,"%Y-%m-%d")),origin="1976-01-01")
 
@@ -55,6 +58,32 @@ MonthlyLFSx1 <- MonthlyLFSx1 %>% group_by(i) %>% mutate(MoMEmpSelf = growthMoM(V
 MonthlyLFSx1 <- MonthlyLFSx1 %>% group_by(i) %>% mutate(YoYEmpSelf = growthYoY(V1087))
 MonthlyLFSx1 <- MonthlyLFSx1 %>% group_by(i) %>% mutate(URLast = LastMonthUR(V922))
 MonthlyLFSx1 <- MonthlyLFSx1 %>% group_by(i) %>% mutate(URLastYear = LastYearUR(V922))
+
+# Create stuff for Gender tab
+
+GenderTable <- MonthlyLFSx %>% select(t,Date,i,V982,V1027,V77,V122,V523,V568)
+
+GenderTable <- GenderTable %>% group_by(i) %>% mutate(URLastFemale = LastMonthUR(V982))
+GenderTable <- GenderTable %>% group_by(i) %>% mutate(URLastMale = LastMonthUR(V1027))
+GenderTable <- GenderTable %>% group_by(i) %>% mutate(URLastYearFemale = LastYearUR(V982))
+GenderTable <- GenderTable %>% group_by(i) %>% mutate(URLastYearMale = LastYearUR(V1027))
+
+# Create stuff for Youth tab
+
+YouthTable <- MonthlyLFSx %>% select(t,Date,i,V6,V138,V226,V453,V912)
+
+# Create stuff for CMA tab
+
+### need to be able to import the CMA file into R somehow
+
+# Create stuff for Industry tab
+
+### table only consists of employment (estimates + standard errors and what not)
+
+IndustryTable <- IndustryLFSx %>% select(t,Date,i,V1,V6,V11,V16,V21,V26,V31,V36,V41,V46,V51,V56,V61,
+                                         V66,V71,V76,V81,V86,V91)
+
+
 
 # Rename variables for better readability
 

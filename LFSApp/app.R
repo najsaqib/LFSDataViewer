@@ -21,7 +21,8 @@ library(xts)
 server <- function(input, output) {
   
   output$LFSTable <- DT::renderDataTable(MonthlyLFSx1 %>% 
-                                           filter(Date==input$RefMonth2),
+                                           filter(Date==input$RefMonth2) %>%
+                                           select(t, Date,i,Employment,UnRate),
                                         colnames = c('Region' = 'i',
                                                      'Unemployment Rate' = 'UnRate'
                                                      ), # headers
@@ -39,7 +40,7 @@ server <- function(input, output) {
                                              )),
                                            columnDefs = list(
                                              list(targets={{0}},visible = FALSE)
-                                             ) # hide second column
+                                             ) # hide first column
                                          ) 
   ) 
   
@@ -397,7 +398,9 @@ server <- function(input, output) {
   ################# UI section starts below #################
 
 # Use a fluid Bootstrap layout
-ui <- fluidPage(    
+ui <- fluidPage(
+  
+  theme = "app.css",
   
   # Give the page a title
   titlePanel("Labour Force Survey Highlights"),

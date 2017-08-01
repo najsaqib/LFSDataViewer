@@ -3,7 +3,7 @@
 ### More data
 
 
-#### Consumper Price Index (CPI)
+#### Consumer Price Index (CPI)
 
 CPI, monthly: [Table 326-0020](http://www5.statcan.gc.ca/cansim/a26?id=3260020)
 

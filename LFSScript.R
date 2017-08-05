@@ -108,18 +108,16 @@ wide_UnRate <- MonthlyLFSx2 %>% select(Date,i,UnRate) %>% spread(i,UnRate)
 
 # Save relevant data frames as RDS files
 
-saveRDS(wide_UnRate, "C:/RProjects/LFS/LFSApp/Data/wideUnRate.rds")
-saveRDS(MonthlyLFSx1, "C:/RProjects/LFS/LFSApp/Data/MonthlyLFSx1.rds")
-saveRDS(MonthlyLFSx2, "C:/RProjects/LFS/LFSApp/Data/MonthlyLFSx2.rds")
+saveRDS(wide_UnRate, "wideUnRate.rds")
+saveRDS(MonthlyLFSx1, "MonthlyLFSx1.rds")
+saveRDS(MonthlyLFSx2, "MonthlyLFSx2.rds")
 
+# Code below is on deploying the app on Shiny; can ignore
 
 # Run the Shiny app
-
 # runApp('LFSApp')
-
 # Deploy the app on Shiny IO
-
-library(shiny)
-#setwd("C:/Users/Najmus/Documents/R/LFSDataViewer")
-setwd("C:/RProjects/LFS")
-rsconnect::deployApp('LFSApp')
+# library(shiny)
+# setwd("C:/Users/Najmus/Documents/R/LFSDataViewer")
+# setwd("C:/RProjects/LFS")
+# rsconnect::deployApp('LFSApp')
